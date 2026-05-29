@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SafeYouth Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: system-ui, sans-serif; background: #0f0f1a; color: #eee; padding: 2rem; }
+        .container { max-width: 1200px; margin:0 auto; }
+        h1 { margin-bottom: 2rem; }
+        .tabs { display: flex; gap: 1rem; border-bottom: 1px solid #333; margin-bottom: 2rem; }
+        .tab-btn { background: none; border: none; color: #ccc; padding: 0.8rem 1.5rem; cursor: pointer; font-size: 1rem; }
+        .tab-btn.active { color: #6c63ff; border-bottom: 2px solid #6c63ff; }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+        .card { background: #1e1e2e; border-radius: 24px; padding: 1.5rem; margin-bottom: 2rem; }
+        input, textarea, select { width: 100%; padding: 0.8rem; margin: 0.5rem 0 1rem; background: #2a2a3a; border: 1px solid #444; color: white; border-radius: 12px; }
+        button { background: #6c63ff; border: none; padding: 0.6rem 1.2rem; border-radius: 40px; color: white; cursor: pointer; margin-right: 0.5rem; }
+        .delete-btn { background: #ff3366; }
+        .user-item, .event-item, .post-item { background: #2a2a3a; margin: 0.5rem 0; padding: 1rem; border-radius: 16px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid #333; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🛡️ SafeYouth Admin Dashboard</h1>
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="courses">📚 Courses</button>
+        <button class="tab-btn" data-tab="users">👥 Users</button>
+        <button class="tab-btn" data-tab="events">📅 Events</button>
+        <button class="tab-btn" data-tab="blog">📝 Blog/News</button>
+        <button class="tab-btn" data-tab="opinions">💬 Opinions</button>
+    </div>
+
+    <!-- Courses Tab -->
+    <div id="courses" class="tab-pane active">
+        <div class="card">
+            <h3>Manage Courses</h3>
+            <select id="courseSelect" onchange="loadCourse()">
+                <option>-- Select Course --</option>
+                <option value="trauma">Healing from Trauma</option>
+                <option value="safety">Personal Safety & Boundaries</option>
+                <option value="addiction">Overcoming Addiction</option>
+                <option value="mindfulness">Mindfulness & Self-Regulation</option>
+            </select>
+            <div id="courseEditor"></div>
+            <button onclick="saveCourse()">Save Course</button>
+        </div>
+    </div>
+
+    <!-- Users Tab -->
+    <div id="users" class="tab-pane">
+        <div class="card">
+            <h3>Anonymous Users</h3>
+            <div id="usersList">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Events Tab -->
+    <div id="events" class="tab-pane">
+        <div class="card">
+            <h3>Add New Event</h3>
+            <input type="text" id="eventTitle" placeholder="Title"><br>
+            <input type="date" id="eventDate"><br>
+            <input type="text" id="eventLink" placeholder="Link (optional)"><br>
+            <button onclick="saveEvent()">Create Event</button>
+        </div>
+        <div id="eventsList"></div>
+    </div>
+
+    <!-- Blog Tab -->
+    <div id="blog" class="tab-pane">
+        <div class="card">
+            <h3>Write New Post</h3>
+            <input type="text" id="postTitle" placeholder="Title"><br>
+            <input type="date" id="postDate"><br>
+            <textarea id="postContent" rows="4" placeholder="Content..."></textarea><br>
+            <button onclick="savePost()">Publish</button>
+        </div>
+        <div id="postsList"></div>
+    </div>
+
+    <!-- Opinions Tab (view messages from Redis) -->
+    <div id="opinions" class="tab-pane">
+        <div class="card">
+            <h3>Anonymous Opinions (from Redis queue)</h3>
+            <div id="opinionsList">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = 'https://your-worker.workers.dev'; // change to your worker URL
+    const ADMIN_KEY = prompt('Enter Admin Key:'); // store in sessionStorage after first login
+    sessionStorage.setItem('admin_key', ADMIN_KEY);
+    const headers = { 'Authorization': `Bearer ${ADMIN_KEY}`, 'Content-Type': 'application/json' };
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+            document.getElementById(btn.dataset.tab).classList.add('active');
+            if (btn.dataset.tab === 'users') loadUsers();
+            if (btn.dataset.tab === 'events') loadEvents();
+            if (btn.dataset.tab === 'blog') loadPosts();
+            if (btn.dataset.tab === 'opinions') loadOpinions();
+        });
+    });
+
+    // Courses
+    async function loadCourse() {
+        const id = document.getElementById('courseSelect').value;
+        if (!id) return;
+        const res = await fetch(`${API_BASE}/api/course/${id}`);
+        const course = await res.json();
+        document.getElementById('courseEditor').innerHTML = `
+            <h4>${course.title}</h4>
+            <div id="modulesContainer">
+                ${course.modules.map((mod, idx) => `
+                    <div>
+                        <strong>Module ${idx+1}</strong><br>
+                        Title: <input type="text" value="${mod.title}" data-module="${idx}" class="mod-title"><br>
+                        Content: <textarea data-module="${idx}" class="mod-content">${mod.content}</textarea><br>
+                        Video URL: <input value="${mod.video || ''}" data-module="${idx}" class="mod-video"><br>
+                        <hr>
+                    </div>
+                `).join('')}
+            </div>
+            <button onclick="addModule()">+ Add Module</button>
+        `;
+        window.currentCourseId = id;
+        window.currentModules = course.modules;
+    }
+
+    function addModule() {
+        window.currentModules.push({ id: `new${Date.now()}`, title: 'New Module', content: '' });
+        loadCourse(); // reload
+    }
+
+    async function saveCourse() {
+        const modules = [];
+        document.querySelectorAll('.mod-title').forEach((input, i) => {
+            const content = document.querySelectorAll('.mod-content')[i]?.value;
+            const video = document.querySelectorAll('.mod-video')[i]?.value;
+            modules.push({
+                id: `mod_${i}`,
+                title: input.value,
+                content: content,
+                video: video
+            });
+        });
+        const courseData = {
+            id: window.currentCourseId,
+            title: document.getElementById('courseSelect').options[document.getElementById('courseSelect').selectedIndex].text,
+            modules
+        };
+        const res = await fetch(`${API_BASE}/api/admin/course`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(courseData)
+        });
+        if (res.ok) alert('Course saved!');
+        else alert('Error');
+    }
+
+    // Users
+    async function loadUsers() {
+        const res = await fetch(`${API_BASE}/api/admin/users`, { headers });
+        const { users } = await res.json();
+        let html = '<table><tr><th>User ID</th><th>Actions</th></tr>';
+        for (let uid of users) {
+            html += `<tr><td>${uid}</td><td><button onclick="viewUserProgress('${uid}')">View Progress</button></td></tr>`;
+        }
+        html += '</table><div id="userProgress"></div>';
+        document.getElementById('usersList').innerHTML = html;
+    }
+    async function viewUserProgress(userId) {
+        const res = await fetch(`${API_BASE}/api/admin/user/${userId}/progress`, { headers });
+        const progress = await res.json();
+        document.getElementById('userProgress').innerHTML = `<pre>${JSON.stringify(progress, null, 2)}</pre>`;
+    }
+
+    // Events
+    async function loadEvents() {
+        const res = await fetch(`${API_BASE}/api/events`);
+        const events = await res.json();
+        let html = events.map(e => `<div class="event-item"><strong>${e.title}</strong> (${e.date})<br><button onclick="deleteEvent(${e.id})" class="delete-btn">Delete</button></div>`).join('');
+        document.getElementById('eventsList').innerHTML = html;
+    }
+    async function saveEvent() {
+        const title = document.getElementById('eventTitle').value;
+        const date = document.getElementById('eventDate').value;
+        const link = document.getElementById('eventLink').value;
+        await fetch(`${API_BASE}/api/admin/event`, { method: 'POST', headers, body: JSON.stringify({ title, date, link }) });
+        alert('Event saved');
+        loadEvents();
+    }
+    async function deleteEvent(id) {
+        await fetch(`${API_BASE}/api/admin/event/${id}`, { method: 'DELETE', headers });
+        loadEvents();
+    }
+
+    // Blog posts (similar)
+    async function loadPosts() {
+        const res = await fetch(`${API_BASE}/api/blog`);
+        const posts = await res.json();
+        let html = posts.map(p => `<div class="post-item"><h4>${p.title}</h4><small>${p.date}</small><p>${p.content}</p><button onclick="deletePost(${p.id})">Delete</button></div>`).join('');
+        document.getElementById('postsList').innerHTML = html;
+    }
+    async function savePost() {
+        const title = document.getElementById('postTitle').value;
+        const date = document.getElementById('postDate').value;
+        const content = document.getElementById('postContent').value;
+        await fetch(`${API_BASE}/api/admin/post`, { method: 'POST', headers, body: JSON.stringify({ title, date, content }) });
+        alert('Post published');
+        loadPosts();
+    }
+    async function deletePost(id) {
+        await fetch(`${API_BASE}/api/admin/post/${id}`, { method: 'DELETE', headers });
+        loadPosts();
+    }
+
+    // Opinions (read from Redis queue)
+    async function loadOpinions() {
+        const res = await fetch(`${API_BASE}/api/admin/opinions`, { headers });
+        const opinions = await res.json();
+        let html = opinions.map(o => `<div><strong>${o.topic}</strong><br>${o.message}<br><small>${o.timestamp}</small><hr></div>`).join('');
+        document.getElementById('opinionsList').innerHTML = html;
+    }
+
+    // Initial load
+    loadEvents();
+    loadPosts();
+</script>
+</body>
+</html>
