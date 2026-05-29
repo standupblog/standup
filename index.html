@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>SafeYouth | Home – Protection & Free Education</title>
+    <meta name="description" content="Anonymous help, free courses, and resources for youth facing abuse, assault, or addiction. Your safe space online.">
+    <meta name="theme-color" content="#0a0a1a">
+    <!-- External CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Fixed Navigation -->
+<div class="navbar">
+    <div class="nav-container">
+        <div class="logo"><i class="fas fa-shield-heart"></i> SafeYouth</div>
+        <div class="nav-links">
+            <a href="index.html" class="active">Home</a>
+            <a href="pages/courses.html">Courses</a>
+            <a href="pages/resources.html">Resources</a>
+            <a href="#safety">Safety Plan</a>
+            <a href="#" id="openModalBtn">Helplines</a>
+            <a href="#" class="panic-btn-nav" id="panicBtnHeader"><i class="fas fa-exclamation-triangle"></i> ESCAPE</a>
+        </div>
+        <div class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Sidebar -->
+<div class="mobile-sidebar" id="mobileSidebar">
+    <div class="close-sidebar" id="closeSidebar">&times;</div>
+    <a href="index.html">Home</a>
+    <a href="pages/courses.html">Courses</a>
+    <a href="pages/resources.html">Resources</a>
+    <a href="#safety">Safety Plan</a>
+    <a href="#" id="openModalBtnMobile">Helplines</a>
+    <a href="#" id="panicBtnMobile"><i class="fas fa-exclamation-triangle"></i> Panic Exit</a>
+</div>
+<div class="overlay" id="overlay"></div>
+
+<!-- Hero Section -->
+<section class="hero" id="home">
+    <div class="hero-content">
+        <h1>You Are Not Alone.<br>We Protect. We Educate.</h1>
+        <p>Free, anonymous courses on healing from abuse, overcoming addiction, and reclaiming your power.</p>
+        <div class="btn-group">
+            <a href="pages/courses.html" class="btn-primary"><i class="fas fa-graduation-cap"></i> Start Learning Free</a>
+            <a href="#" id="emergencyBtn" class="btn-outline">Need Help Now →</a>
+        </div>
+    </div>
+</section>
+
+<!-- Courses Preview Section with Swiper -->
+<section id="courses-preview">
+    <div class="container">
+        <h2 class="section-title"><i class="fas fa-book-open"></i> Free Recovery Courses</h2>
+        <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <i class="fas fa-heart-broken course-icon"></i>
+                    <h3>Healing from Trauma</h3>
+                    <p>Coping strategies, grounding techniques, and self-worth rebuilding.</p>
+                    <button class="course-btn" onclick="location.href='pages/courses.html#trauma'">Start Module →</button>
+                </div>
+                <div class="swiper-slide">
+                    <i class="fas fa-shield-alt course-icon"></i>
+                    <h3>Personal Safety & Boundaries</h3>
+                    <p>Identify red flags, create safety plans, build assertiveness.</p>
+                    <button class="course-btn" onclick="location.href='pages/courses.html#safety'">Start Module →</button>
+                </div>
+                <div class="swiper-slide">
+                    <i class="fas fa-hand-holding-heart course-icon"></i>
+                    <h3>Overcoming Addiction</h3>
+                    <p>Understand triggers, resilience, and support groups.</p>
+                    <button class="course-btn" onclick="location.href='pages/courses.html#addiction'">Start Module →</button>
+                </div>
+                <div class="swiper-slide">
+                    <i class="fas fa-brain course-icon"></i>
+                    <h3>Mindfulness & Self-Regulation</h3>
+                    <p>Reduce anxiety and flashbacks with practical tools.</p>
+                    <button class="course-btn" onclick="location.href='pages/courses.html#mindfulness'">Start Module →</button>
+                </div>
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Safety Plan Section (on homepage) -->
+<section id="safety">
+    <div class="container">
+        <h2 class="section-title"><i class="fas fa-shield-virus"></i> Create Your Digital Safety Plan</h2>
+        <div class="safety-card">
+            <p><strong>Step 1:</strong> Memorize a safe word with a trusted friend.</p>
+            <p><strong>Step 2:</strong> Keep a hidden "go bag" with essentials.</p>
+            <p><strong>Step 3:</strong> Use our panic button to instantly hide this page.</p>
+            <button id="panicSafetyBtn" class="panic-btn-large"><i class="fas fa-eye-slash"></i> PANIC MODE (Hide page)</button>
+        </div>
+    </div>
+</section>
+
+<!-- Modal for Helplines -->
+<div id="helplineModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeModalBtn">&times;</span>
+        <h2>📞 24/7 Helplines – Free & Confidential</h2>
+        <ul>
+            <li><strong>National Sexual Assault Hotline:</strong> 800-656-4673</li>
+            <li><strong>Crisis Text Line:</strong> Text HOME to 741741</li>
+            <li><strong>SAMHSA (Addiction/Mental Health):</strong> 1-800-662-4357</li>
+            <li><strong>Childhelp National Child Abuse:</strong> 1-800-422-4453</li>
+            <li><strong>The Trevor Project (LGBTQ+):</strong> 1-866-488-7386</li>
+        </ul>
+        <p><i class="fas fa-globe"></i> <a href="https://www.childhelplineinternational.org" target="_blank">International Directory</a></p>
+    </div>
+</div>
+
+<!-- Anonymous Chat Widget -->
+<div class="chat-widget">
+    <div class="chat-bubble" id="chatBubble">
+        <i class="fas fa-comment"></i>
+    </div>
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">💬 Anonymous Supporter</div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="bot-msg">🤝 Hi, we're here for you. How can we support you today?</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Type a message...">
+            <button id="sendChatBtn">Send</button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>⚡ Your safety is our priority. This platform is anonymous & encrypted. If you are in immediate danger, call emergency services.</p>
+    <p>© 2025 SafeYouth — Free Education & Protection for Youth Worldwide</p>
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="js/swiper-init.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
