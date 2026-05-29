@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head><title>Blog & Events – SafeYouth</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div class="navbar">...</div>
+<div class="container" style="padding-top: 100px;">
+    <h1 class="section-title">📰 News & Events</h1>
+    <div id="blogPosts"></div>
+    <h2 class="section-title">📅 Upcoming Events</h2>
+    <div id="eventsList"></div>
+</div>
+<script>
+    const API_BASE = 'https://your-worker.workers.dev';
+    async function loadBlog() {
+        const res = await fetch(`${API_BASE}/api/blog`);
+        const posts = await res.json();
+        document.getElementById('blogPosts').innerHTML = posts.map(p => `<div style="background:#FFF4E8; border-radius: 28px; margin:1rem 0; padding:1.5rem;"><h3>${p.title}</h3><small>${p.date}</small><p>${p.content}</p></div>`).join('');
+    }
+    async function loadEvents() {
+        const res = await fetch(`${API_BASE}/api/events`);
+        const events = await res.json();
+        document.getElementById('eventsList').innerHTML = events.map(e => `<div style="background:#FFF4E8; border-radius: 28px; margin:1rem 0; padding:1.5rem;"><h3>${e.title}</h3><p>${e.date}</p><a href="${e.link}">Join →</a></div>`).join('');
+    }
+    loadBlog(); loadEvents();
+</script>
+<footer>...</footer>
+<script src="../js/main.js"></script>
+</body>
+</html>
