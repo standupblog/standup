@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head><title>Speak Freely – SafeYouth</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+<div class="navbar">...</div>
+<div class="container" style="max-width: 600px; margin: 120px auto;">
+    <h1>💬 Speak Freely. No Fear.</h1>
+    <p>Your message goes anonymously to our support team. We’ll reply via this page (check using your ID).</p>
+    <form id="opinionForm">
+        <label>Topic</label>
+        <select id="topic"><option>General Support</option><option>Course Feedback</option><option>Abuse Experience</option><option>Addiction Help</option><option>Just need to talk</option></select>
+        <label>Your message</label>
+        <textarea id="message" rows="5" required></textarea>
+        <button type="submit" class="btn-primary">Send anonymously →</button>
+    </form>
+    <div id="result"></div>
+</div>
+<script>
+    const userId = localStorage.getItem('user_id') || 'user_' + Math.random().toString(36).substring(2);
+    localStorage.setItem('user_id', userId);
+    const API_BASE = 'https://your-worker.workers.dev';
+    document.getElementById('opinionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const message = document.getElementById('message').value;
+        const topic = document.getElementById('topic').value;
+        const res = await fetch(`${API_BASE}/api/opinion`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message, topic, userId })
+        });
+        if (res.ok) document.getElementById('result').innerHTML = '✅ Sent. You are not alone.';
+        else document.getElementById('result').innerHTML = '❌ Error, try again.';
+        document.getElementById('message').value = '';
+    });
+</script>
+<footer>...</footer>
+<script src="../js/main.js"></script>
+</body>
+</html>
